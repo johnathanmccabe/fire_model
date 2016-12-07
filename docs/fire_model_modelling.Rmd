@@ -1,0 +1,216 @@
+---
+title: "Fire Rating - Modelling Overview"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  html_notebook:
+    code_folding: hide
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  html_document:
+    code_folding: hide
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+
+
+
+# Version History
+
+Date                | Version       | Description           | Author
+:-------------------|:--------------|:----------------------|:----------------
+15 November 2016    | 1.0           | Initial draft         | Johnathan McCabe
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = F)
+```
+
+```{r library, message = F, warning = F, results='asis', fig.height=7.5,fig.width=7.5}
+## load packages
+library(pacman)
+p_load(dplyr)
+p_load(reshape2)
+p_load(caret)
+p_load(ggplot2)
+p_load(data.table)
+p_load(knitr)
+p_load(scales)
+library(Faraday.Pricing)
+library(formattable)
+```
+
+# Executive Summary
+
+
+# Location Data
+
+
+# Calculation
+
+The following defintions are used. Where a symbol has $j$ superscript, this signifies that there is a separate value for each of buildings (B), contents (C) and BI.
+
+
+Symbol        | Defintion
+:-------------|:-----------------------
+T_i^j         | TIV for buildings, contents or BI
+r^j           | Base rate
+u             | uplift factor
+s^j_i         | state factor
+o^j_i         | occupancy factor
+b_i^j         | construction factor
+p_i^j         | protection class factor
+k_i           | sprinkler factor 
+
+
+## Base Loss Cost
+
+The base loss cost $L_i$ for location $i$ is calculated as a product of the base rate and the various adjustment factors
+
+$$
+L_i = \sum_{j \in \{B,C,BI\}} T_i^j \; r^j \; u \; s_i^j \; o_i^j \; b_i^j \; p_i \; k_i
+$$
+
+
+
+
+
+# Base Rates
+
+Base rates are specified for each of buildings, contents and business interruption.
+
+
+
+# Adjustments
+
+## Occupancy
+
+The occupancy adjustment is based on the ATC class for the location. 
+
+The same adjustment is applied to buildings, contents and BI.
+
+## Construction
+
+There are five ISO classes for the construction type. The adjustment factor for a location is determined from the ISO construction class of that location.
+
+The same adjustment is applied to buildings, contents and BI.
+
+
+## Protection Class
+
+The adjustment for protection class is dependent upon two factors:
+
+- construction group 
+  
+  Either unknown, non-fire resistant or fire resistant.
+  
+- protection class code
+
+  There are a range of value ranging from high protection to unprotected.
+
+
+## Sprinklers
+
+Three options are used to encode the presence of sprinklers at a location:
+
+- not present
+- present
+- unknown
+
+'Not present' and 'unknown' will be treated in the same manner with no adjustment to the calculated loss cost.
+If sprinklers are present then a discount will be applied to the loss cost. This discount is dependent on the occupancy class of the building.
+
+See Appendix A for more details.
+
+
+
+# SIR Adjustment
+
+SIRs are allowed for by calculating an adjustment to the base loss cost. This adjustment is calculated in two parts:
+
+- adjustment for the portion of the SIR less than $75k
+- adjustment for the portion of the SIR above $75k
+
+## SIR adjustment to $75k
+
+The SIR adjustment is calculated by applying a bilinear interpolation function to a table of adjustment factors driven by SIR and total TIV for the location. This is equivalent to a linear interpolation on TIV followed by a subsequent linear interpolation on the SIR.
+
+If the SIR or TIV value falls outside the range of values in the table then the closest adjustment factor is used.
+
+If the SIR and TIV both fall between points in the table, then the adjustment factor is calculated as
+
+$$
+k = \frac{1}{(x_2 - x_1)(y_2 - y_1))} \left[ \begin{array}{c} x_2 -x \\ x - x_1 \end{array} \right]^t  \left[ \begin{array}{cc} v_{11} & v_{12} \\ v_{21} & v_{22} \end{array} \right] \left[ \begin{array}{c} y_2 - y \\ y - y_1 \end{array} \right] 
+$$
+
+The adjustment values are shown in Appendix B
+
+
+
+
+
+\newpage
+
+# Appendix A - Sprinkler Discount Rates {-}
+
+```{r sprinkler-discount, message = F, warning = F, results='asis', fig.height=7.5,fig.width=7.5}
+
+
+qry <- "SELECT 
+	distinct
+	atc_group,
+	no.ATC_DESC,
+	SPRINKLER
+  FROM [fire_engine].[dbo].[new_occupancy] no
+  order by atc_group"
+
+df <- get_data_from_sql_server(query = qry,
+                               server = "GBLONTDV56\\PRICING,57066",
+                               database = "fire_engine")
+
+k.df <- df %>% 
+  mutate(SPRINKLER = percent(SPRINKLER, digits = 0)) %>% 
+  arrange(ATC_DESC)
+
+k <- kable(k.df, col.names = c("ATC Code", "Description", "Adjustment Factor"))
+print(k)
+
+
+```
+
+\newpage
+
+# Appendix B - SIR Adjustment Factors
+
+
+```{r sir-1, message = F, warning = F, results='asis', fig.height=7.5,fig.width=7.5}
+
+qry <- "SELECT [sir], [tiv]
+                          ,[adjustment]
+                          FROM [fire_engine].[dbo].[sir_curve]"
+
+sir_adj.df <- get_data_from_sql_server(query = qry,
+                                       server = "GBLONTDV56\\PRICING,57066",
+                                       database = "fire_engine")
+
+
+k.df <- sir_adj.df %>% 
+  mutate(tiv = comma(tiv, digits = 0),
+         sir = comma(sir, digits = 0),
+         adjustment = percent(adjustment, digits = 1))
+
+k <- kable(k.df, col.names = c("TIV", "SIR", "Adjustment Factor"))
+print(k)
+
+```
+
