@@ -63,14 +63,14 @@ The following defintions are used. Where a symbol has $j$ superscript, this sign
 
 Symbol        | Defintion
 :-------------|:-----------------------
-T_i^j         | TIV for buildings, contents or BI
-r^j           | Base rate
-u             | uplift factor
-s^j_i         | state factor
-o^j_i         | occupancy factor
-b_i^j         | construction factor
-p_i^j         | protection class factor
-k_i           | sprinkler factor 
+$T_i^j$         | TIV for buildings, contents or BI
+$r^j$           | Base rate
+$u$             | uplift factor
+$s^j_i$         | state factor
+$o^j_i$         | occupancy factor
+$b_i^j$         | construction factor
+$p_i^j$         | protection class factor
+$k_i$           | sprinkler factor 
 
 
 ## Base Loss Cost
@@ -209,7 +209,7 @@ k.df <- sir_adj.df %>%
          sir = comma(sir, digits = 0),
          adjustment = percent(adjustment, digits = 1))
 
-k <- kable(k.df, col.names = c("TIV", "SIR", "Adjustment Factor"))
+k <- kable(k.df, col.names = c("SIR", "TIV", "Adjustment Factor"))
 print(k)
 
 ```
