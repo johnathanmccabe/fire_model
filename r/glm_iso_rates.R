@@ -22,18 +22,18 @@ data <- fread("U:/FRE/Actuarial/2016 Work/Pricing Ultimates/Q2 2016/Comm Lines/i
 clean_column_names <- function(column_names){
   colnames <- gsub(x = column_names, pattern = "[^0-9a-zA-Z]", replacement = "")
   colnames <- gsub(x = colnames, pattern = "([[:lower:]])([[:upper:]])", replacement = "\\1_\\2" )
-  colnames <- gsub(x = colnames, 
+  colnames <- gsub(x = colnames,
                    pattern = "([[:upper:]])([[:upper:]])([[:lower:]])",
                    replacement = "\\1_\\2\\3" )
   colnames <- tolower(colnames)
-  
-  return(colnames)  
+
+  return(colnames)
 }
 
 colnames(data) <- clean_column_names(colnames(data))
 
 
-data <- data %>% 
+data <- data %>%
   mutate_each(funs(as.factor), state, coverage, construction, occupancy)
 
 glm.model <- glm(data = data, formula = rate ~ state + coverage + construction + occupancy,

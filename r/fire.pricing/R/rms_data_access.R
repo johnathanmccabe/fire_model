@@ -8,7 +8,10 @@
 
 get_rms_fire_engine_locations <- function(server, edm, account, peril = 5){
 
-  qry <- Faraday.Pricing::read_sql("./inst/sql/fire_engine_locations.sql")
+  # fpath <- system.file("sql", "fire_engine_locations.sql", package="fire.pricing")
+  fpath <- "./inst/sql/fire_engine_locations.sql"
+
+  qry <- Faraday.Pricing::read_sql(fpath)
 
   qry <- gsub(pattern = "&db&", replacement = edm, x = qry)
   qry <- gsub(pattern = "&account&", replacement = account, x = qry)
@@ -30,7 +33,10 @@ get_rms_fire_engine_locations <- function(server, edm, account, peril = 5){
 
 find_rms_account <- function(sequel_id, server, edms = NULL){
 
-  qry <- Faraday.Pricing::read_sql("./inst/sql/rms_Account_group.sql")
+  # fpath <- system.file("sql", "rms_account_group.sql", package="fire.pricing")
+  fpath <- "./inst/sql/rms_account_group.sql"
+
+  qry <- Faraday.Pricing::read_sql(fpath)
   qry <- gsub(pattern = "&sequel_id&", replacement = sequel_id, x = qry)
 
   ##generate list if edms is null
@@ -99,6 +105,12 @@ FROM master.sys.databases"
   return(retVal)
 }
 
+#' Get the year from a Sequel ID
+#'
+#' @param sequel_id The Sequel ID. This should be of the form 'AA000A00A000'
+#' @return
+#' @details
+#' @examples
 .get_year_from_sequel_id <- function(sequel_id){
 
   # regex <- "RMS_EDM_QTE_[0-9]{2}(_[0-9]{2})*"
