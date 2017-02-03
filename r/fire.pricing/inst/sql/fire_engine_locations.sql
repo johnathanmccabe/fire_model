@@ -12,6 +12,8 @@ SELECT
 	, dbo_Loc.STATECODE
 	, dbo_Loc.CNTRYSCHEME
 	, dbo_Loc.CNTRYCODE
+	, dbo_Loc.LATITUDE
+	, dbo_Loc.LONGITUDE
 	, dbo_Loc.BLDGSCHEME
 	, dbo_Loc.BLDGCLASS
 	, dbo_Loc.OCCSCHEME
@@ -46,6 +48,8 @@ GROUP BY
 	, dbo_Loc.STATECODE
 	, dbo_Loc.CNTRYSCHEME
 	, dbo_Loc.CNTRYCODE
+	, dbo_Loc.LATITUDE
+	, dbo_Loc.LONGITUDE
 	, dbo_Loc.BLDGSCHEME
 	, dbo_Loc.BLDGCLASS
 	, dbo_Loc.OCCSCHEME

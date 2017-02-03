@@ -8,8 +8,8 @@
 
 get_rms_fire_engine_locations <- function(server, edm, account, peril = 5){
 
-  # fpath <- system.file("sql", "fire_engine_locations.sql", package="fire.pricing")
-  fpath <- "./inst/sql/fire_engine_locations.sql"
+  fpath <- system.file("sql", "fire_engine_locations.sql", package="fire.pricing")
+  # fpath <- "./inst/sql/fire_engine_locations.sql"
 
   qry <- Faraday.Pricing::read_sql(fpath)
 
@@ -33,8 +33,8 @@ get_rms_fire_engine_locations <- function(server, edm, account, peril = 5){
 
 find_rms_account <- function(sequel_id, server, edms = NULL){
 
-  # fpath <- system.file("sql", "rms_account_group.sql", package="fire.pricing")
-  fpath <- "./inst/sql/rms_account_group.sql"
+  fpath <- system.file("sql", "rms_account_group.sql", package="fire.pricing")
+  # fpath <- "./inst/sql/rms_account_group.sql"
 
   qry <- Faraday.Pricing::read_sql(fpath)
   qry <- gsub(pattern = "&sequel_id&", replacement = sequel_id, x = qry)
@@ -120,14 +120,19 @@ FROM master.sys.databases"
   return(as.integer(year))
 }
 
-xx <- get_rms_fire_engine_locations(edm = "RMS_EDM_QTE_16",
-                          server = "GBLONTPD111",
-                          account = "CL16_CG278N16A000_01")
+# xx <- get_rms_fire_engine_locations(edm = "RMS_EDM_QTE_16",
+#                           server = "GBLONTPD111",
+#                           account = "CL16_CG278N16A000_01")
 
-t0 <- proc.time()
-xx <- find_rms_account(sequel_id = "CC656B13A000", server = "GBLONTPD111") #, edms = "RMS_EDM_QTE_16_10")
-print(proc.time() - t0)
+# t0 <- proc.time()
+# xx <- find_rms_account(sequel_id = "CC656B13A000", server = "GBLONTPD111") #, edms = "RMS_EDM_QTE_16_10")
+# print(proc.time() - t0)
+#
+# yy <- get_rms_fire_engine_locations(edm = xx$edm[11],
+#                                     server = "GBLONTPD111",
+#                                     account = xx$ACCGRPNUM[11])
+#
+#
+# install_svn("http://jmccabe:jmccabe@gblontas69:8081/svn/Faraday.Pricing.Calculation",
+#             subdir = "R.Projects/faraday-pricing")
 
-yy <- get_rms_fire_engine_locations(edm = xx$edm[11],
-                                    server = "GBLONTPD111",
-                                    account = xx$ACCGRPNUM[11])

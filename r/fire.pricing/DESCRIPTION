@@ -10,5 +10,14 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat
-Imports: Faraday.Pricing,
-    stringr
+Depends: 
+  Faraday.Pricing, 
+  stringr, 
+  ggplot2, 
+  choroplethr, 
+  choroplethrMaps, 
+  maptools, 
+  maps, 
+  sp, 
+  dplyr, 
+  RODBC
